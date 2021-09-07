@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>DeepAR</title>
+    <style>
+      body {
+        display: grid;
+        place-items: center;
+        height: 100vh;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Hello App</h1>
+    <button id="btn-capture" type="button">Take Snapshot</button>
+    <canvas id="deepar-canvas"></canvas>
+    <script type="text/javascript" src="lib/deepar.js"></script>
+    <script type="text/javascript">
+      let btnCapture = document.getElementById("btn-capture");
+      let deepArCanvas = document.getElementById("deepar-canvas");
+
+      btnCapture.addEventListener(
+        "click",
+        () => {
+          deepArCanvas.toBlob((blob) => {
+            takePicture(
+              blob,
+              `snapshot-${deepArCanvas.width}x${deepArCanvas.height}.png`
+            );
+          });
+          // takePicture();
+        },
+        false
+      );
+
+      const takePicture = (function () {
+        const a = document.createElement("a");
+        // document.body.appendChild(a);
+        // a.style.display = "none";
+        return function saveData(blob, fileName) {
+          // const url = URL.createObjectURL(blob);
+          let context = deepArCanvas.getContext("webgl", {
+            preserveDrawingBuffer: true,
+          });
+          console.log(context);
+          const url = deepArCanvas.toDataURL("image/png");
+          console.log(url);
+          a.href = url;
+          // a.download = fileName;
+          a.click();
+        };
+      })();
+
+      // Initialize the DeepAR object
+      var deepAR = DeepAR({
+        licenseKey:
+          "a4042474d00c783e68a7d66f064c09adca6e896143e4eb156c35503440ae99b8605320d5f529392b",
+        canvasWidth: 1200, // window.innerWidth,
+        canvasHeight: 700, // window.innerHeight,
+        canvas: document.getElementById("deepar-canvas"),
+        numberOfFaces: 1, // how many faces we want to track min 1, max 4
+        onInitialize: function () {
+          // start video immediately after the initalization, mirror = true
+          deepAR.startVideo(true);
+          // load the aviators effect on the first face into slot 'slot'
+          deepAR.switchEffect(0, "slot", "./aviators", function () {
+            // effect loaded
+          });
+        },
+      });
+
+      // download the face tracking model
+      deepAR.downloadFaceTrackingModel("models/models-68-extreme.bin");
+    </script>
+  </body>
+</html>
