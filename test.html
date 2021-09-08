@@ -1,34 +1,42 @@
 <!DOCTYPE html>
-<head>
-<script>
-function drawInCanvas() {
-var canvas = document.getElementById("html5canvas");
-if (canvas.getContext) { // Check if HTML5 Canvas is supported
-// Draw in Canvas element
-var context = canvas.getContext("2d"); // get Canvas Context
-context.rect(10, 10, 100, 100); // draw rectangle
-context.fill(); // fill inside rectangle in HTML5 canvas space
-}
-}
-function canvasToImage() {
-var canvas = document.getElementById("html5canvas");
-if (canvas.getContext) { // Check if HTML5 Canvas is supported
-// Canvas to Image
-var canvasImageData = canvas.toDataURL(); // save canvas to image data in .png format
-var image = document.getElementById("html5Image"); // get image element in HTML page
-image.src = canvasImageData; // set image source to canvas image data
-}
-}
-</script>
-</head>
-<body>
-<article>
-<button onclick="drawInCanvas();">Draw in Canvas</button><br />
-<button onclick="canvasToImage();">Canvas to Image</button><br />
-<canvas id="html5canvas"><br />
-</article>
-<article>
-<img id="html5Image" style="border-width:thin;border-style:solid;border-color:Red;" />
-</article>
-</body>
+<html>
+  <body>
+    <p>Canvas:</p>
+    <canvas id="myCanvas" width="240" height="297">
+      Your browser does not support the HTML5 canvas tag.
+    </canvas>
+
+    <script>
+      window.onload = function () {
+        var c = document.getElementById("myCanvas");
+        var ctx = c.getContext("2d");
+        const img = new Image();
+        img.src = "./img_the_scream.jpg";
+        img.onload = () => {
+          ctx.drawImage(img, 0, 0);
+          c.toBlob((blob) => {
+            takePicture(
+              blob,
+              `snapshot-${new Date()
+                .toJSON()
+                .slice(0, 10)
+                .replace(/-/g, "")}.png`
+            );
+          });
+        };
+
+        const takePicture = (function () {
+          const a = document.createElement("a");
+          document.body.appendChild(a);
+          a.style.display = "none";
+          return function saveData(blob, fileName) {
+            const url = window.URL.createObjectURL(blob);
+            a.href = url;
+            a.download = fileName;
+            a.click();
+          };
+        })();
+      };
+    </script>
+  </body>
 </html>
